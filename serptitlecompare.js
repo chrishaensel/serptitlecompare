@@ -15,14 +15,24 @@ javascript: (function (doc) {
                 position++;
             }
         });
+        const allItems = [];
         var numItems = 1;
         cors_proxies = ['https://api.codetabs.com/v1/proxy?quest=', 'https://jsonp.afeld.me/?url=', 'https://cors.bridged.cc/'];
         items.forEach(item => {
-            $.ajax({
+            var useItem = {};
+            var use_url = item[2];
+            useItem.url = use_url;
+                $.ajax({
                 url: cors_proxies[Math.floor(Math.random() * cors_proxies.length)] + item[2],
                 success: function (data, status, xhr) {
-                    title = $(data).filter('title').text();
-                    var h1 = $(data).find("h1:first").text();
+                    title = $(data).filter('title').text().trim();
+                    var h1 = $(data).find("h1:first").text().trim();
+                    useItem.pageTitle = title;
+                    useItem.googleTitle = item[1];
+                    useItem.pageH1 = h1;
+                    useItem.uses_title = false;
+                    useItem.uses_h1 = false;
+                    useItem.title_rewritten = false;
                     var html = '<div class="title-changed">';
                     var uses_h1 = false;
                     if(h1 == item[1]) {
@@ -31,6 +41,7 @@ javascript: (function (doc) {
                     if (title != item[1]) {
                         html += '<span style="font-weight: bold;color: #ff6961;">Title: ' + title + '</span>';
                         changed++;
+                        useItem.title_rewritten = true;
                     } else {
                         html += '<span style="font-weight: bold;color: darkgreen;">Title: ' + item[1] + '</span>';
                     }
@@ -43,10 +54,12 @@ javascript: (function (doc) {
 
                     html += '</div>';
                     if(uses_h1) {
+                        useItem.uses_h1 = true;
                         html += '<div style="display: inline-block; background-color: #ffd811; border: 1px solid rgb(74, 85, 104); color: rgb(74, 85, 104); padding-left: 4px; padding-right: 4px; border-radius: 4px;"><b>USES H1</b></div>';
                     }
                     html +=  '</div>';
                     item[3].find('div').first().append(html);
+                    allItems.push(useItem);
                 },
                 error: function (xhr, status, error) {
                     var html = '<div class="title-changed">';
@@ -56,7 +69,7 @@ javascript: (function (doc) {
                 },
                 complete: function (xhr, status) {
                     if (numItems == items.length) {
-                        petitionCompleted();
+                        petitionCompleted(allItems);
                     } else {
                         numItems++;
                     }
@@ -65,8 +78,19 @@ javascript: (function (doc) {
         });
     }
 
-    function petitionCompleted() {
+    function petitionCompleted(allItems) {
         $('#result-stats').append('<span id="CountTitlesChanged"> - ' + changed + ' titles have changed on this SERP</span>');
+        downloadObjectAsJson(allItems, "comparison-" + $("input[name=q]").val());
+    }
+
+    function downloadObjectAsJson(exportObj, exportName){
+        var dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(exportObj));
+        var downloadAnchorNode = document.createElement('a');
+        downloadAnchorNode.setAttribute("href",     dataStr);
+        downloadAnchorNode.setAttribute("download", exportName + ".json");
+        document.body.appendChild(downloadAnchorNode);
+        downloadAnchorNode.click();
+        downloadAnchorNode.remove();
     }
 
     if (typeof jQuery == 'undefined') {
