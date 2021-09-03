@@ -10,6 +10,6 @@ This bookmarklet is based on the bookmarklet by  Fede Gomez: https://gist.github
 
 Copy the bookmarklets code to a new bookmark in your toolbar.
 
-##Contact 
+## Contact 
 
 [chris@haensel.pro](mailto:chris@haensel.pro)
