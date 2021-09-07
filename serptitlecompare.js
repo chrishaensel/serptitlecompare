@@ -38,13 +38,35 @@ javascript: (function (doc) {
                     useItem.uses_title = false;
                     useItem.uses_h1 = false;
                     useItem.title_rewritten = false;
+                    useItem.title_truncated = false;
                     var html = '<div class="title-changed">';
                     var uses_h1 = false;
-                    if (h1 == item[1]) {
+                    // Google uses the h1 (only if h1 != actual page title)
+                    if (h1 == item[1] && h1 != useItem.pageTitle) {
                         uses_h1 = true;
                     }
+
+                    // Check for truncated title 
+                    // We only take the first part before "..." and then remove the "..."
+                    // to check whether the actual page title includes the first part of the truncated title used by Google 
+                    if(useItem.googleTitle.includes("...")) {
+                        var google_title_split = useItem.googleTitle.split("...")[0];
+                        var compare_google_title_truncated = google_title_split.replace("...", "");
+                        if((useItem.pageTitle.includes(compare_google_title_truncated))) {
+                            useItem.title_truncated = true;
+                        }
+                    }
+                    
+                    
+
                     if (title != item[1]) {
-                        html += '<span style="font-weight: bold;color: #ff6961;">Title: ' + title + '</span>';
+                        var display_title_pre = "Title: ";
+                        var display_title_color = "#ff6961";
+                        if(useItem.title_truncated) {
+                            display_title_pre = "Title TRUNCATED: ";
+                            display_title_color = "#a6cc1d";
+                        }
+                        html += '<span style="font-weight: bold;color: #ff6961;">'+ display_title_pre + ' ' + title + '</span>';
                         changed++;
                         useItem.title_rewritten = true;
                     } else {
@@ -52,7 +74,7 @@ javascript: (function (doc) {
                     }
                     html += '<div style="display: block; padding:2px 0; font-weight:bold; color: dodgerblue">';
                     if (h1.length && typeof h1 === "string") {
-                        html += 'h1 (1st): ' + h1;
+                        html += 'h1: ' + h1;
                     } else {
                         html += 'No h1 found on page';
                     }
@@ -60,7 +82,7 @@ javascript: (function (doc) {
                     html += '</div>';
                     if (uses_h1) {
                         useItem.uses_h1 = true;
-                        html += '<div style="display: inline-block; background-color: #ffd811; border: 1px solid rgb(74, 85, 104); color: rgb(74, 85, 104); padding-left: 4px; padding-right: 4px; border-radius: 4px;"><b>USES H1</b></div>';
+                        html += '<div style="display: inline-block; background-color: #ffd811; border: 1px solid rgb(74, 85, 104); color: rgb(74, 85, 104); padding-left: 4px; padding-right: 4px; border-radius: 4px;"><b>Uses H1</b></div>';
                     }
                     html += '</div>';
                     item[3].find('div').first().append(html);
