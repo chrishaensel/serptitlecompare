@@ -10,7 +10,7 @@ javascript: (function (doc) {
         $('#chtop').append('<div style="display: inline-block; color: red;" id="waitforme">Please wait...</div>');
         var position = 1;
         var items = [];
-        var results = $('#rso .kp-blk .g, #rso .g[class="g"], #rso .srg .g').not('.kno-kp .g').find('div:first').find('a:first');
+        var results = $('#rso .g').not('.kno-kp .g').find('a:first');
         $('.title-changed, #CountTitlesChanged').remove();
         console.log(results);
         results.each(function () {
