@@ -41,14 +41,10 @@ javascript: (function (doc) {
                     useItem.title_truncated = false;
                     var html = '<div class="title-changed">';
                     var uses_h1 = false;
-                    // Google uses the h1 (only if h1 != actual page title)
                     if (h1 == item[1] && h1 != useItem.pageTitle) {
                         uses_h1 = true;
                     }
 
-                    // Check for truncated title 
-                    // We only take the first part before "..." and then remove the "..."
-                    // to check whether the actual page title includes the first part of the truncated title used by Google 
                     if(useItem.googleTitle.includes("...")) {
                         var google_title_split = useItem.googleTitle.split("...")[0];
                         var compare_google_title_truncated = google_title_split.replace("...", "");
